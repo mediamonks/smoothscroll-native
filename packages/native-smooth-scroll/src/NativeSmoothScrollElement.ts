@@ -10,7 +10,7 @@ const DEFAULT_OPTIONS: Required<NativeSmoothScrollElementOptions> = {
 };
 
 export class NativeSmoothScrollElement {
-  private readonly element: HTMLElement;
+  private element: HTMLElement | null;
   private bounds: Bounds | null = null;
   private position: number = 0;
   private readonly options: Required<NativeSmoothScrollElementOptions>;
@@ -39,9 +39,11 @@ export class NativeSmoothScrollElement {
   }
 
   public measure(scrollPosition: number) {
-    const bounds = this.element.getBoundingClientRect();
+    if (this.element) {
+      const bounds = this.element.getBoundingClientRect();
 
-    this.bounds = { ...bounds.toJSON(), top: bounds.top + scrollPosition };
+      this.bounds = { ...bounds.toJSON(), top: bounds.top + scrollPosition };
+    }
   }
 
   public update(viewportHeight: number, scrollPosition: number) {
@@ -70,5 +72,10 @@ export class NativeSmoothScrollElement {
     }
 
     return Math.max(position, 0);
+  }
+
+  public destruct() {
+    this.element = null;
+    this.bounds = null;
   }
 }

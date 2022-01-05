@@ -30,6 +30,8 @@ export class NativeSmoothScroll {
     window.addEventListener('resize', this.onResize, { passive: true });
 
     this.scrollPosition = window.scrollY;
+    this.targetScrollPosition = this.scrollPosition;
+
     this.viewportHeight = window.innerHeight;
 
     gsap.ticker.add(this.updateScrollPosition);
@@ -94,4 +96,15 @@ export class NativeSmoothScroll {
       this.update();
     }
   };
+
+  public destruct() {
+    gsap.ticker.remove(this.updateScrollPosition);
+
+    window.removeEventListener('scroll', this.onScroll);
+    window.removeEventListener('resize', this.onResize);
+
+    this.elements.forEach((element) => {
+      element.destruct();
+    });
+  }
 }
