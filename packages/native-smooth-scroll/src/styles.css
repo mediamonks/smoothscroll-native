@@ -1,0 +1,31 @@
+body {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.scroll-element {
+  width: 100%;
+  position: relative;
+  font-size: 20px;
+  color: black;
+}
+
+.scroll-element-1 {
+  height: 100vh;
+  background-color: #007FFF;
+}
+
+.scroll-element-2 {
+  height: 100vh;
+  background-color: #32de84;
+}
+
+.scroll-element-3 {
+  height: 200vh;
+  background: linear-gradient(0deg, rgba(34,195,42,1) 0%, rgba(45,67,253,1) 100%);;
+}
+
+.scroll-element-4 {
+  height: 100vh;
+  background: linear-gradient(0deg, #EF0107 0%, rgba(253,187,45,1) 100%);
+}
