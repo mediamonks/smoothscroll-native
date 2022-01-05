@@ -13,6 +13,7 @@ export class NativeSmoothScrollElement {
   private element: HTMLElement | null;
   private bounds: Bounds | null = null;
   private position: number = 0;
+  private progress: number = 0;
   private readonly options: Required<NativeSmoothScrollElementOptions>;
 
   public constructor(element: HTMLElement, options?: NativeSmoothScrollElementOptions) {
@@ -50,16 +51,25 @@ export class NativeSmoothScrollElement {
   public update(viewportHeight: number, scrollPosition: number) {
     if (this.bounds) {
       const rawPosition = Math.round(this.bounds.top - scrollPosition);
+      const minPosition = -this.bounds.height;
+      const maxPosition = viewportHeight;
 
       const position = gsap.utils.clamp(
-        -this.bounds.height,
-        viewportHeight + this.bounds.height,
+        minPosition,
+        maxPosition,
         this.options.sticky ? this.getStickyPosition(rawPosition, viewportHeight) : rawPosition,
+      );
+
+      this.progress = gsap.utils.clamp(
+        0,
+        1,
+        gsap.utils.normalize(maxPosition, minPosition, rawPosition),
       );
 
       if (this.position !== position) {
         gsap.set(this.element, {
           y: position,
+          visibility: this.progress === 0 || this.progress === 1 ? 'hidden' : 'visible',
         });
 
         this.position = position;
