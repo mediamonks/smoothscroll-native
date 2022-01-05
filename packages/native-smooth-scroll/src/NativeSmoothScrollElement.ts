@@ -10,16 +10,23 @@ const DEFAULT_OPTIONS: Required<NativeSmoothScrollElementOptions> = {
 };
 
 export class NativeSmoothScrollElement {
-  private element: HTMLElement | null;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  private _element: HTMLElement | null;
   private bounds: Bounds | null = null;
   private position: number = 0;
   private progress: number = 0;
   private readonly options: Required<NativeSmoothScrollElementOptions>;
 
   public constructor(element: HTMLElement, options?: NativeSmoothScrollElementOptions) {
-    this.element = element;
+    // eslint-disable-next-line no-underscore-dangle
+    this._element = element;
 
     this.options = { ...DEFAULT_OPTIONS, ...options };
+  }
+
+  public get element() {
+    // eslint-disable-next-line no-underscore-dangle
+    return this._element;
   }
 
   public get height() {
@@ -95,7 +102,8 @@ export class NativeSmoothScrollElement {
   }
 
   public destruct() {
-    this.element = null;
+    // eslint-disable-next-line no-underscore-dangle
+    this._element = null;
     this.bounds = null;
   }
 }
