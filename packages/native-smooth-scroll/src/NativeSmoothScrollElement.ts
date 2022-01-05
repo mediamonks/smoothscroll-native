@@ -2,10 +2,10 @@ import gsap from 'gsap';
 import type { Bounds } from './types';
 
 export interface NativeSmoothScrollElementOptions {
-  sticky: boolean;
+  sticky?: boolean;
 }
 
-const DEFAULT_OPTIONS: NativeSmoothScrollElementOptions = {
+const DEFAULT_OPTIONS: Required<NativeSmoothScrollElementOptions> = {
   sticky: false,
 };
 
@@ -13,12 +13,9 @@ export class NativeSmoothScrollElement {
   private readonly element: HTMLElement;
   private bounds: Bounds | null = null;
   private position: number = 0;
-  private readonly options: NativeSmoothScrollElementOptions;
+  private readonly options: Required<NativeSmoothScrollElementOptions>;
 
-  public constructor(
-    element: HTMLElement,
-    options: Partial<NativeSmoothScrollElementOptions> = {},
-  ) {
+  public constructor(element: HTMLElement, options?: NativeSmoothScrollElementOptions) {
     this.element = element;
 
     this.options = { ...DEFAULT_OPTIONS, ...options };
