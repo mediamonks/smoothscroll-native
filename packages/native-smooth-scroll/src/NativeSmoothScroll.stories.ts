@@ -2,30 +2,54 @@ import global from 'global';
 import { useEffect } from '@storybook/client-api';
 
 import './styles.css';
-import { NativeSmoothScroll } from './NativeSmoothScroll';
+import { NativeSmoothScroll, NativeSmoothScrollOptions } from './NativeSmoothScroll';
+import type { NativeSmoothScrollElementOptions } from './NativeSmoothScrollElement';
 
 export default {
   title: 'NativeSmoothScroll',
 };
 
+const getNativeSmoothScrollInstance = (
+  containerSelector: string,
+  options?: NativeSmoothScrollOptions,
+) => {
+  const container = global.document.querySelector<HTMLElement>(containerSelector);
+
+  if (container) {
+    const instance = new NativeSmoothScroll();
+    instance.init(container, options);
+
+    return instance;
+  }
+
+  return null;
+};
+
+const addScrollElements = (
+  instance: NativeSmoothScroll | null,
+  selector: string,
+  options?: NativeSmoothScrollElementOptions,
+) => {
+  if (instance) {
+    const scrollElements = Array.from(global.document.querySelectorAll<HTMLElement>(selector));
+
+    scrollElements.forEach((block) => {
+      instance.addElement(block, options);
+    });
+  }
+};
+
+const defaultHtml = `<div id="scroll-container">
+      <div class="scroll-element scroll-element-1">1</div>
+      <div class="scroll-element scroll-element-2">2</div>
+      <div class="scroll-element scroll-element-3">3</div>
+      <div class="scroll-element scroll-element-4">4</div>
+    </div>`;
+
 export const Default = () => {
   useEffect(() => {
-    const container = global.document.querySelector<HTMLElement>('#scroll-container');
-
-    let nativeSmoothScroll: NativeSmoothScroll;
-
-    if (container) {
-      nativeSmoothScroll = new NativeSmoothScroll();
-      nativeSmoothScroll.init(container);
-
-      const scrollElements = Array.from(
-        global.document.querySelectorAll<HTMLElement>('.scroll-element'),
-      );
-
-      scrollElements.forEach((block) => {
-        nativeSmoothScroll.addElement(block);
-      });
-    }
+    const nativeSmoothScroll = getNativeSmoothScrollInstance('#scroll-container');
+    addScrollElements(nativeSmoothScroll, '.scroll-element');
 
     return () => {
       if (nativeSmoothScroll) {
@@ -34,24 +58,14 @@ export const Default = () => {
     };
   });
 
-  return `<div id="scroll-container">
-      <div class="scroll-element scroll-element-1">1</div>
-      <div class="scroll-element scroll-element-2">2</div>
-      <div class="scroll-element scroll-element-3">3</div>
-      <div class="scroll-element scroll-element-4">4</div>
-    </div>`;
+  return defaultHtml;
 };
 
 export const Sticky = (props: { sticky: boolean }) => {
   useEffect(() => {
-    const container = global.document.querySelector<HTMLElement>('#scroll-container');
+    const nativeSmoothScroll = getNativeSmoothScrollInstance('#scroll-container');
 
-    let nativeSmoothScroll: NativeSmoothScroll;
-
-    if (container) {
-      nativeSmoothScroll = new NativeSmoothScroll();
-      nativeSmoothScroll.init(container);
-
+    if (nativeSmoothScroll) {
       const scrollElements = Array.from(
         global.document.querySelectorAll<HTMLElement>('.scroll-element'),
       );
@@ -82,22 +96,10 @@ Sticky.args = {
 
 export const Lerp = (props: { lerp: number }) => {
   useEffect(() => {
-    const container = global.document.querySelector<HTMLElement>('#scroll-container');
-
-    let nativeSmoothScroll: NativeSmoothScroll;
-
-    if (container) {
-      nativeSmoothScroll = new NativeSmoothScroll();
-      nativeSmoothScroll.init(container, { lerp: props.lerp });
-
-      const scrollElements = Array.from(
-        global.document.querySelectorAll<HTMLElement>('.scroll-element'),
-      );
-
-      scrollElements.forEach((block) => {
-        nativeSmoothScroll.addElement(block);
-      });
-    }
+    const nativeSmoothScroll = getNativeSmoothScrollInstance('#scroll-container', {
+      lerp: props.lerp,
+    });
+    addScrollElements(nativeSmoothScroll, '.scroll-element');
 
     return () => {
       if (nativeSmoothScroll) {
@@ -106,12 +108,7 @@ export const Lerp = (props: { lerp: number }) => {
     };
   });
 
-  return `<div id="scroll-container">
-      <div class="scroll-element scroll-element-1">1</div>
-      <div class="scroll-element scroll-element-2">2</div>
-      <div class="scroll-element scroll-element-3">3</div>
-      <div class="scroll-element scroll-element-4">4</div>
-    </div>`;
+  return defaultHtml;
 };
 
 Lerp.args = {
