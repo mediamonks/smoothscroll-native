@@ -22,7 +22,7 @@ export class NativeSmoothScroll {
   private targetScrollPosition: number = 0;
   private viewportHeight: number = 0;
 
-  public init(container: HTMLElement, options: NativeSmoothScrollOptions) {
+  public init(container: HTMLElement, options?: NativeSmoothScrollOptions) {
     this.container = container;
     this.options = { ...DEFAULT_OPTIONS, ...options };
 
