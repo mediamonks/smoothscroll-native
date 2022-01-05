@@ -15,7 +15,7 @@ const DEFAULT_OPTIONS: Required<NativeSmoothScrollOptions> = {
 
 export class NativeSmoothScroll {
   private container: HTMLElement | null = null;
-  private readonly elements: Array<NativeSmoothScrollElement> = [];
+  private elements: Array<NativeSmoothScrollElement> = [];
   private options: Required<NativeSmoothScrollOptions> = DEFAULT_OPTIONS;
 
   private scrollPosition: number = 0;
@@ -44,6 +44,28 @@ export class NativeSmoothScroll {
 
     this.updateSizes();
     this.update();
+
+    return elementInstance;
+  }
+
+  public removeElement(element: HTMLElement | NativeSmoothScrollElement) {
+    let instance: NativeSmoothScrollElement | null;
+
+    if (element instanceof HTMLElement) {
+      instance =
+        this.elements.find((elementInstance) => elementInstance.element === element) || null;
+    } else {
+      instance = element;
+    }
+
+    if (instance) {
+      this.elements = this.elements.filter((elementInstance) => elementInstance !== instance);
+
+      instance.destruct();
+
+      this.updateSizes();
+      this.update();
+    }
   }
 
   private update() {
