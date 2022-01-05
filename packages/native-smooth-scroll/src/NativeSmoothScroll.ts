@@ -5,16 +5,26 @@ import {
   NativeSmoothScrollElementOptions,
 } from './NativeSmoothScrollElement';
 
+export interface NativeSmoothScrollOptions {
+  lerp?: number;
+}
+
+const DEFAULT_OPTIONS: Required<NativeSmoothScrollOptions> = {
+  lerp: 0.1,
+};
+
 export class NativeSmoothScroll {
-  private readonly element: HTMLElement;
+  private container: HTMLElement | null = null;
   private readonly elements: Array<NativeSmoothScrollElement> = [];
+  private options: Required<NativeSmoothScrollOptions> = DEFAULT_OPTIONS;
 
   private scrollPosition: number = 0;
   private targetScrollPosition: number = 0;
-  private viewportHeight: number;
+  private viewportHeight: number = 0;
 
-  public constructor(element: HTMLElement) {
-    this.element = element;
+  public init(container: HTMLElement, options: NativeSmoothScrollOptions) {
+    this.container = container;
+    this.options = { ...DEFAULT_OPTIONS, ...options };
 
     window.addEventListener('scroll', this.onScroll, { passive: true });
     window.addEventListener('resize', this.onResize, { passive: true });
@@ -25,7 +35,7 @@ export class NativeSmoothScroll {
     gsap.ticker.add(this.updateScrollPosition);
   }
 
-  public addElement(element: HTMLElement, options?: Partial<NativeSmoothScrollElementOptions>) {
+  public addElement(element: HTMLElement, options?: NativeSmoothScrollElementOptions) {
     const elementInstance = new NativeSmoothScrollElement(element, options);
 
     this.elements.push(elementInstance);
@@ -59,7 +69,7 @@ export class NativeSmoothScroll {
       return result + element.height;
     }, 0);
 
-    gsap.set(this.element, { height });
+    gsap.set(this.container, { height });
   }
 
   private readonly onScroll = () => {
@@ -78,7 +88,7 @@ export class NativeSmoothScroll {
       this.scrollPosition = gsap.utils.interpolate(
         this.scrollPosition,
         this.targetScrollPosition,
-        0.1,
+        this.options.lerp,
       );
 
       this.update();
