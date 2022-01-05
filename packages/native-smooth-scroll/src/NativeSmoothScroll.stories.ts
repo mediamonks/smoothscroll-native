@@ -120,3 +120,40 @@ Lerp.argTypes = {
     control: { type: 'range', min: 0.01, max: 1, step: 0.01 },
   },
 };
+
+export const RemoveElement = () => {
+  useEffect(() => {
+    const nativeSmoothScroll = getNativeSmoothScrollInstance('#scroll-container');
+
+    addScrollElements(nativeSmoothScroll, '.scroll-element');
+
+    const removeButton = global.document.querySelector<HTMLElement>('#removeButton');
+
+    if (removeButton) {
+      removeButton.addEventListener('click', () => {
+        const elements = Array.from(
+          global.document.querySelectorAll<HTMLElement>('.scroll-element'),
+        );
+
+        const element = elements[Math.floor(Math.random() * elements.length)];
+
+        if (element && element.parentNode) {
+          element.parentNode.removeChild(element);
+
+          nativeSmoothScroll?.removeElement(element);
+        }
+      });
+    }
+
+    return () => {
+      if (nativeSmoothScroll) {
+        nativeSmoothScroll.destruct();
+      }
+    };
+  });
+
+  return `
+    <div class="button-bar"><button id="removeButton" class="btn btn-primary">Remove element</button></div>
+    ${defaultHtml}
+   `;
+};

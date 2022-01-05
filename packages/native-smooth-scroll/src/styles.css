@@ -29,3 +29,13 @@ body {
   height: 100vh;
   background: linear-gradient(0deg, #EF0107 0%, rgba(253,187,45,1) 100%);
 }
+
+.button-bar {
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  z-index: 1;
+  background-color: white;
+  border-top: 1px solid gray;
+  padding: 10px;
+}
