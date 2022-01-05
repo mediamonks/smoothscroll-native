@@ -13,7 +13,8 @@ export const Default = () => {
     const container = global.document.querySelector<HTMLElement>('#scroll-container');
 
     if (container) {
-      const nativeSmoothScroll = new NativeSmoothScroll(container);
+      const nativeSmoothScroll = new NativeSmoothScroll();
+      nativeSmoothScroll.init(container);
       const scrollElements = Array.from(
         global.document.querySelectorAll<HTMLElement>('.scroll-element'),
       );
