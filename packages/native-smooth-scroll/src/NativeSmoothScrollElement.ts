@@ -27,7 +27,12 @@ export class NativeSmoothScrollElement {
   }
 
   public resetStyles() {
-    gsap.set(this.element, { position: 'relative', y: 0, willChange: 'auto' });
+    gsap.set(this.element, {
+      position: 'relative',
+      y: 0,
+      willChange: 'auto',
+      visibility: 'visible',
+    });
   }
 
   public applyStyles() {
