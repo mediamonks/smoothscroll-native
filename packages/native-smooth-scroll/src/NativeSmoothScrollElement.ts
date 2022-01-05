@@ -49,7 +49,7 @@ export class NativeSmoothScrollElement {
 
   public update(viewportHeight: number, scrollPosition: number) {
     if (this.bounds) {
-      const rawPosition = this.bounds.top - scrollPosition;
+      const rawPosition = Math.round(this.bounds.top - scrollPosition);
 
       const position = gsap.utils.clamp(
         -this.bounds.height,
@@ -68,6 +68,10 @@ export class NativeSmoothScrollElement {
   }
 
   private getStickyPosition(position: number, viewportHeight: number): number {
+    if (this.bounds && position + this.bounds.height <= 0) {
+      return position;
+    }
+
     if (this.bounds && this.bounds.height + position < viewportHeight) {
       return (viewportHeight - (this.bounds.height + position)) * -1;
     }
