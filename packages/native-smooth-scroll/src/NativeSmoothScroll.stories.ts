@@ -2,7 +2,7 @@ import global from 'global';
 import { useEffect } from '@storybook/client-api';
 
 import './styles.css';
-import NativeSmoothScroll from './NativeSmoothScroll';
+import { NativeSmoothScroll } from './NativeSmoothScroll';
 
 export default {
   title: 'NativeSmoothScroll',

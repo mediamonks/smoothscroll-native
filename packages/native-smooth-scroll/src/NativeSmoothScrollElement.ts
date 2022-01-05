@@ -9,7 +9,7 @@ const DEFAULT_OPTIONS: NativeSmoothScrollElementOptions = {
   sticky: false,
 };
 
-export default class NativeSmoothScrollElement {
+export class NativeSmoothScrollElement {
   private readonly element: HTMLElement;
   private bounds: Bounds | null = null;
   private position: number = 0;

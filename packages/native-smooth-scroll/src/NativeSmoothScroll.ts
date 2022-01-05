@@ -1,10 +1,11 @@
 import gsap from 'gsap';
 import { debounce } from 'lodash-es';
-import NativeSmoothScrollElement, {
+import {
+  NativeSmoothScrollElement,
   NativeSmoothScrollElementOptions,
 } from './NativeSmoothScrollElement';
 
-export default class NativeSmoothScroll {
+export class NativeSmoothScroll {
   private readonly element: HTMLElement;
   private readonly elements: Array<NativeSmoothScrollElement> = [];
 
