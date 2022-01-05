@@ -12,9 +12,12 @@ export const Default = () => {
   useEffect(() => {
     const container = global.document.querySelector<HTMLElement>('#scroll-container');
 
+    let nativeSmoothScroll: NativeSmoothScroll;
+
     if (container) {
-      const nativeSmoothScroll = new NativeSmoothScroll();
+      nativeSmoothScroll = new NativeSmoothScroll();
       nativeSmoothScroll.init(container);
+
       const scrollElements = Array.from(
         global.document.querySelectorAll<HTMLElement>('.scroll-element'),
       );
@@ -23,7 +26,13 @@ export const Default = () => {
         nativeSmoothScroll.addElement(block);
       });
     }
-  }, []);
+
+    return () => {
+      if (nativeSmoothScroll) {
+        nativeSmoothScroll.destruct();
+      }
+    };
+  });
 
   return `<div id="scroll-container">
       <div class="scroll-element scroll-element-1">1</div>
