@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "name": "native-smooth-scroll",
+  "workspaces": [
+    "./packages/*"
+  ]
+}
