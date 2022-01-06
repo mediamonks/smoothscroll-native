@@ -53,8 +53,7 @@ export class NativeSmoothScroll {
 
     this.elements.push(elementInstance);
 
-    this.updateSizes();
-    this.update();
+    this.invalidate();
 
     return elementInstance;
   }
@@ -74,8 +73,7 @@ export class NativeSmoothScroll {
 
       instance.destruct();
 
-      this.updateSizes();
-      this.update();
+      this.invalidate();
     }
   }
 
@@ -89,13 +87,17 @@ export class NativeSmoothScroll {
     this._isEnabled = value;
 
     if (this.isEnabled) {
-      this.updateSizes();
-      this.update();
+      this.invalidate();
     } else {
       this.elements.forEach((element) => {
         element.resetStyles();
       });
     }
+  }
+
+  public invalidate() {
+    this.updateSizes();
+    this.update();
   }
 
   private update() {
