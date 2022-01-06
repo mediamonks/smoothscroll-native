@@ -193,3 +193,55 @@ export const EnableDisable = () => {
     ${defaultHtml}
    `;
 };
+
+export const StickyElement = () => {
+  useEffect(() => {
+    const nativeSmoothScroll = getNativeSmoothScrollInstance('#scroll-container');
+
+    if (nativeSmoothScroll) {
+      const scrollElements = Array.from(
+        global.document.querySelectorAll<HTMLElement>('.scroll-element'),
+      );
+
+      scrollElements.forEach((block, index) => {
+        nativeSmoothScroll.addElement(block, {
+          sticky: index === 2,
+          stickyElement: index === 2 ? block.querySelector<HTMLElement>('.sticky') : null,
+        });
+      });
+
+      const checkbox = global.document.querySelector<HTMLInputElement>('#enabled');
+
+      if (checkbox) {
+        nativeSmoothScroll?.setIsEnabled(checkbox.checked);
+
+        checkbox.addEventListener('change', () => {
+          nativeSmoothScroll?.setIsEnabled(checkbox.checked);
+        });
+      }
+    }
+
+    return () => {
+      if (nativeSmoothScroll) {
+        nativeSmoothScroll.destruct();
+      }
+    };
+  });
+
+  return `
+    <div class="button-bar">
+      <div class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox" checked id="enabled">
+          <label class="form-check-label" for="enabled">
+              Smooth Scroll Enabled
+          </label>
+      </div>
+    </div>
+    <div id="scroll-container">
+      <div class="scroll-element scroll-element-1">1</div>
+      <div class="scroll-element scroll-element-2">2</div>
+      <div class="scroll-element scroll-element-3"><div class="sticky">I am a sticky element</div></div>
+      <div class="scroll-element scroll-element-4">4</div>
+    </div>
+  `;
+};

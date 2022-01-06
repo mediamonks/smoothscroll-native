@@ -40,6 +40,13 @@ body {
   padding: 10px;
 }
 
+.sticky {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  background-color: red;
+}
+
 label {
   color: black;
 }
