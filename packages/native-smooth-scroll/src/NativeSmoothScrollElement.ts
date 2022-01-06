@@ -3,10 +3,12 @@ import type { Bounds } from './types';
 
 export interface NativeSmoothScrollElementOptions {
   sticky?: boolean;
+  stickyElement?: HTMLElement | null;
 }
 
 const DEFAULT_OPTIONS: Required<NativeSmoothScrollElementOptions> = {
   sticky: false,
+  stickyElement: null,
 };
 
 export class NativeSmoothScrollElement {
@@ -40,6 +42,10 @@ export class NativeSmoothScrollElement {
       willChange: 'auto',
       visibility: 'visible',
     });
+
+    if (this.options.sticky && this.options.stickyElement) {
+      gsap.set(this.options.stickyElement, { position: 'sticky', top: 0 });
+    }
   }
 
   public applyStyles() {
@@ -50,6 +56,10 @@ export class NativeSmoothScrollElement {
       y: this.position,
       willChange: 'transform',
     });
+
+    if (this.options.sticky && this.options.stickyElement) {
+      gsap.set(this.options.stickyElement, { position: 'relative', top: 0 });
+    }
   }
 
   public measure(scrollPosition: number) {
