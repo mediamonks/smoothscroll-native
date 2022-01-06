@@ -1,5 +1,6 @@
 import gsap from 'gsap';
 import type { Bounds } from './types';
+import { getRelativePosition, getStickyPosition } from './utils/positionUtils';
 
 export interface NativeSmoothScrollElementOptions {
   sticky?: boolean;
@@ -33,6 +34,10 @@ export class NativeSmoothScrollElement {
 
   public get height() {
     return this.bounds?.height || 0;
+  }
+
+  public get top() {
+    return this.bounds?.top || 0;
   }
 
   public resetStyles() {
@@ -79,7 +84,9 @@ export class NativeSmoothScrollElement {
       const position = gsap.utils.clamp(
         minPosition,
         maxPosition,
-        this.options.sticky ? this.getStickyPosition(rawPosition, viewportHeight) : rawPosition,
+        this.options.sticky
+          ? getStickyPosition(rawPosition, this.bounds.height, viewportHeight)
+          : rawPosition,
       );
 
       this.progress = gsap.utils.clamp(
@@ -99,16 +106,30 @@ export class NativeSmoothScrollElement {
     }
   }
 
-  private getStickyPosition(position: number, viewportHeight: number): number {
-    if (this.bounds && position + this.bounds.height <= 0) {
-      return position;
+  public getRelativeChildPosition(target: string | HTMLElement) {
+    if (this.element) {
+      if (target instanceof HTMLElement) {
+        if (target === this.element) {
+          return 0;
+        }
+
+        if (this.element?.contains(target)) {
+          return getRelativePosition(target, this.element);
+        }
+      } else {
+        if (this.element?.matches(`#${target}`)) {
+          return 0;
+        }
+
+        const targetElement = this.element?.querySelector<HTMLElement>(`#${target}`);
+
+        if (targetElement) {
+          return getRelativePosition(targetElement, this.element);
+        }
+      }
     }
 
-    if (this.bounds && this.bounds.height + position < viewportHeight) {
-      return (viewportHeight - (this.bounds.height + position)) * -1;
-    }
-
-    return Math.max(position, 0);
+    return null;
   }
 
   public destruct() {
