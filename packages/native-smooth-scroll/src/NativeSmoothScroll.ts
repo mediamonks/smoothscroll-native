@@ -1,5 +1,5 @@
 import gsap from 'gsap';
-import { debounce } from 'lodash-es';
+import { debounce, isBoolean } from 'lodash-es';
 import {
   NativeSmoothScrollElement,
   NativeSmoothScrollElementOptions,
@@ -39,7 +39,11 @@ export class NativeSmoothScroll {
 
     this.viewportHeight = window.innerHeight;
 
-    this.setIsEnabled(this.options.isEnabled && !hasTouchSupport() && !prefersReducedMotion());
+    this.setIsEnabled(
+      isBoolean(options?.isEnabled)
+        ? Boolean(options?.isEnabled)
+        : !hasTouchSupport() && !prefersReducedMotion(),
+    );
 
     gsap.ticker.add(this.updateScrollPosition);
   }
