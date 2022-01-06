@@ -43,3 +43,7 @@ body {
 label {
   color: black;
 }
+
+.form-check-input {
+  border: 1px solid grey;
+}
