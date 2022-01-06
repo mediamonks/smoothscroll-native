@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import global from 'global';
 import { useEffect } from '@storybook/client-api';
 
@@ -34,10 +35,10 @@ const addScrollElements = (
   if (instance) {
     const scrollElements = Array.from(global.document.querySelectorAll<HTMLElement>(selector));
 
-    scrollElements.forEach((block) => {
-      instance.addElement(block, options);
-    });
+    return scrollElements.map((block) => instance.addElement(block, options));
   }
+
+  return [];
 };
 
 const defaultHtml = `<div id="scroll-container">
@@ -279,6 +280,10 @@ export const Lock = () => {
       if (nativeSmoothScroll) {
         nativeSmoothScroll.destruct();
       }
+
+      if (lockCheckbox) {
+        enableBodyScroll(lockCheckbox);
+      }
     };
   });
 
@@ -299,5 +304,113 @@ export const Lock = () => {
       </div>
       <div>
       ${defaultHtml}
+   `;
+};
+
+export const ScrollTo = () => {
+  useEffect(() => {
+    const nativeSmoothScroll = getNativeSmoothScrollInstance('#scroll-container', {
+      isEnabled: false,
+    });
+    const instances = addScrollElements(nativeSmoothScroll, '.scroll-element');
+
+    const lockCheckbox = global.document.querySelector<HTMLInputElement>('#locked');
+    const enableCheckbox = global.document.querySelector<HTMLInputElement>('#enabled');
+
+    if (lockCheckbox) {
+      lockCheckbox.addEventListener('change', () => {
+        if (lockCheckbox.checked) {
+          disableBodyScroll(lockCheckbox);
+        } else {
+          enableBodyScroll(lockCheckbox);
+        }
+      });
+    }
+
+    if (enableCheckbox) {
+      nativeSmoothScroll?.setIsEnabled(enableCheckbox.checked);
+
+      enableCheckbox.addEventListener('change', () => {
+        nativeSmoothScroll?.setIsEnabled(enableCheckbox.checked);
+      });
+    }
+
+    const randomElement = global.document.querySelector<HTMLInputElement>('#randomElement');
+    const elementScrollButton =
+      global.document.querySelector<HTMLInputElement>('#elementScrollButton');
+    const idScrollButton = global.document.querySelector<HTMLInputElement>('#idScrollButton');
+    const instanceScrollButton =
+      global.document.querySelector<HTMLInputElement>('#instanceScrollButton');
+    const instanceElementScrollButton = global.document.querySelector<HTMLInputElement>(
+      '#instanceElementScrollButton',
+    );
+    const positionScrollButton =
+      global.document.querySelector<HTMLInputElement>('#positionScrollButton');
+
+    elementScrollButton?.addEventListener('click', () => {
+      if (randomElement) {
+        nativeSmoothScroll?.scrollTo(randomElement);
+      }
+    });
+
+    idScrollButton?.addEventListener('click', () => {
+      nativeSmoothScroll?.scrollTo('idElement');
+    });
+
+    instanceScrollButton?.addEventListener('click', () => {
+      if (instances[1]) {
+        nativeSmoothScroll?.scrollTo(instances[1]);
+      }
+    });
+
+    instanceElementScrollButton?.addEventListener('click', () => {
+      if (instances[3] && instances[3].element) {
+        nativeSmoothScroll?.scrollTo(instances[3].element);
+      }
+    });
+
+    positionScrollButton?.addEventListener('click', () => {
+      nativeSmoothScroll?.scrollTo(
+        (document.documentElement.scrollHeight - window.innerHeight) * Math.random(),
+      );
+    });
+
+    return () => {
+      if (nativeSmoothScroll) {
+        nativeSmoothScroll.destruct();
+      }
+
+      if (lockCheckbox) {
+        enableBodyScroll(lockCheckbox);
+      }
+    };
+  });
+
+  return `
+     <div class="button-bar">
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" id="locked">
+            <label class="form-check-label" for="locked">
+                Locked
+            </label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" checked id="enabled">
+            <label class="form-check-label" for="enabled">
+                Smooth Scroll Enabled
+            </label>
+        </div>
+        <button id="elementScrollButton" class="btn btn-primary">Scroll to element</button>
+        <button id="idScrollButton" class="btn btn-primary">Scroll to id</button>
+        <button id="instanceScrollButton" class="btn btn-primary">Scroll to instance</button>
+        <button id="instanceElementScrollButton" class="btn btn-primary">Scroll to instance element</button>
+        <button id="positionScrollButton" class="btn btn-primary">Scroll to random position</button>
+      </div>
+      <div id="scroll-container">
+        <div class="scroll-element scroll-element-1">1 <div id="randomElement">I am an element</div></div>
+        <div class="scroll-element scroll-element-2">2 (I am an instance)</div>
+        <div class="scroll-element scroll-element-3" id="idElement">3 (I have an id)</div>
+        <div class="scroll-element scroll-element-4">4 (I am an instance element)</div>
+      </div>
    `;
 };
