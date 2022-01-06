@@ -4,6 +4,7 @@ import {
   NativeSmoothScrollElement,
   NativeSmoothScrollElementOptions,
 } from './NativeSmoothScrollElement';
+import { hasTouchSupport, prefersReducedMotion } from './utils/featureDetectionUtils';
 
 export interface NativeSmoothScrollOptions {
   lerp?: number;
@@ -17,6 +18,8 @@ export class NativeSmoothScroll {
   private container: HTMLElement | null = null;
   private elements: Array<NativeSmoothScrollElement> = [];
   private options: Required<NativeSmoothScrollOptions> = DEFAULT_OPTIONS;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  private _isEnabled: boolean = true;
 
   private scrollPosition: number = 0;
   private targetScrollPosition: number = 0;
@@ -33,6 +36,8 @@ export class NativeSmoothScroll {
     this.targetScrollPosition = this.scrollPosition;
 
     this.viewportHeight = window.innerHeight;
+
+    this.setIsEnabled(!hasTouchSupport() && !prefersReducedMotion());
 
     gsap.ticker.add(this.updateScrollPosition);
   }
@@ -68,13 +73,38 @@ export class NativeSmoothScroll {
     }
   }
 
+  public get isEnabled() {
+    // eslint-disable-next-line no-underscore-dangle
+    return this._isEnabled;
+  }
+
+  public setIsEnabled(value: boolean) {
+    // eslint-disable-next-line no-underscore-dangle
+    this._isEnabled = value;
+
+    if (this.isEnabled) {
+      this.updateSizes();
+      this.update();
+    } else {
+      this.elements.forEach((element) => {
+        element.resetStyles();
+      });
+    }
+  }
+
   private update() {
+    if (!this.isEnabled) {
+      return;
+    }
+
     this.elements.forEach((element) => {
       element.update(this.viewportHeight, this.scrollPosition);
     });
   }
 
   private updateSizes() {
+    if (!this.isEnabled) return;
+
     const scrollPosition = window.scrollY;
 
     this.elements.forEach((element) => {
