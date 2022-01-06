@@ -2,6 +2,7 @@ import global from 'global';
 import { useEffect } from '@storybook/client-api';
 
 import './styles.css';
+import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
 import { NativeSmoothScroll, NativeSmoothScrollOptions } from './NativeSmoothScroll';
 import type { NativeSmoothScrollElementOptions } from './NativeSmoothScrollElement';
 
@@ -244,4 +245,59 @@ export const StickyElement = () => {
       <div class="scroll-element scroll-element-4">4</div>
     </div>
   `;
+};
+
+export const Lock = () => {
+  useEffect(() => {
+    const nativeSmoothScroll = getNativeSmoothScrollInstance('#scroll-container', {
+      isEnabled: false,
+    });
+    addScrollElements(nativeSmoothScroll, '.scroll-element');
+
+    const lockCheckbox = global.document.querySelector<HTMLInputElement>('#locked');
+    const enableCheckbox = global.document.querySelector<HTMLInputElement>('#enabled');
+
+    if (lockCheckbox) {
+      lockCheckbox.addEventListener('change', () => {
+        if (lockCheckbox.checked) {
+          disableBodyScroll(lockCheckbox);
+        } else {
+          enableBodyScroll(lockCheckbox);
+        }
+      });
+    }
+
+    if (enableCheckbox) {
+      nativeSmoothScroll?.setIsEnabled(enableCheckbox.checked);
+
+      enableCheckbox.addEventListener('change', () => {
+        nativeSmoothScroll?.setIsEnabled(enableCheckbox.checked);
+      });
+    }
+
+    return () => {
+      if (nativeSmoothScroll) {
+        nativeSmoothScroll.destruct();
+      }
+    };
+  });
+
+  return `
+     <div class="button-bar">
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" id="locked">
+            <label class="form-check-label" for="locked">
+                Locked
+            </label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" checked id="enabled">
+            <label class="form-check-label" for="enabled">
+                Smooth Scroll Enabled
+            </label>
+        </div>
+      </div>
+      <div>
+      ${defaultHtml}
+   `;
 };
