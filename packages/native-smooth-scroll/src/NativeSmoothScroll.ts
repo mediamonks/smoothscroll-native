@@ -8,10 +8,12 @@ import { hasTouchSupport, prefersReducedMotion } from './utils/featureDetectionU
 
 export interface NativeSmoothScrollOptions {
   lerp?: number;
+  isEnabled?: boolean;
 }
 
 const DEFAULT_OPTIONS: Required<NativeSmoothScrollOptions> = {
   lerp: 0.1,
+  isEnabled: true,
 };
 
 export class NativeSmoothScroll {
@@ -37,7 +39,7 @@ export class NativeSmoothScroll {
 
     this.viewportHeight = window.innerHeight;
 
-    this.setIsEnabled(!hasTouchSupport() && !prefersReducedMotion());
+    this.setIsEnabled(this.options.isEnabled && !hasTouchSupport() && !prefersReducedMotion());
 
     gsap.ticker.add(this.updateScrollPosition);
   }
