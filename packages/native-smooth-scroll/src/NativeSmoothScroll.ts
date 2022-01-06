@@ -1,5 +1,5 @@
 import gsap from 'gsap';
-import { debounce, isBoolean } from 'lodash-es';
+import { debounce, isBoolean, isNumber } from 'lodash-es';
 import {
   NativeSmoothScrollElement,
   NativeSmoothScrollElementOptions,
@@ -98,6 +98,37 @@ export class NativeSmoothScroll {
   public invalidate() {
     this.updateSizes();
     this.update();
+  }
+
+  public scrollTo(target: string | number | NativeSmoothScrollElement | HTMLElement) {
+    let targetPosition: number | null = null;
+
+    if (isNumber(target)) {
+      targetPosition = target;
+    } else if (target instanceof NativeSmoothScrollElement) {
+      if (this.isEnabled) {
+        targetPosition = target.top;
+      } else {
+        targetPosition = (target.element?.getBoundingClientRect().top || 0) + window.scrollY;
+      }
+    } else {
+      for (const elementInstance of this.elements) {
+        const position = elementInstance.getRelativeChildPosition(target);
+
+        if (position !== null) {
+          targetPosition =
+            position +
+            (this.isEnabled
+              ? elementInstance.top
+              : (elementInstance.element?.getBoundingClientRect().top || 0) + window.scrollY);
+          break;
+        }
+      }
+    }
+
+    if (targetPosition !== null) {
+      window.scroll({ left: 0, top: targetPosition, behavior: this.isEnabled ? 'auto' : 'smooth' });
+    }
   }
 
   private update() {
