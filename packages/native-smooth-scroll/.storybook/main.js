@@ -1,16 +1,12 @@
 module.exports = {
   core: {
-    builder: "webpack5",
+    builder: 'webpack5',
   },
-  'stories': [
+  stories: [
     '../src/**/*.docs.mdx',
     '../src/**/*.stories.mdx',
     '../src/**/*.stories.@(js|jsx|ts|tsx)',
   ],
-  'addons': [
-    '@storybook/addon-links',
-    '@storybook/addon-essentials',
-    '@storybook/addon-postcss',
-  ],
+  addons: ['@storybook/addon-links', '@storybook/addon-essentials', '@storybook/addon-postcss'],
   staticDirs: ['../public'],
 };
