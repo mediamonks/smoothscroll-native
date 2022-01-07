@@ -11,17 +11,21 @@ import { getAlignPosition, getAlignPositionByElement } from './utils';
 export interface NativeSmoothScrollOptions {
   lerp?: number;
   isEnabled?: boolean;
+  isResizeObserverEnabled?: boolean;
 }
 
 const DEFAULT_OPTIONS: Required<NativeSmoothScrollOptions> = {
   lerp: 0.1,
   isEnabled: true,
+  isResizeObserverEnabled: false,
 };
 
 export class NativeSmoothScroll {
   private container: HTMLElement | null = null;
   private elements: Array<NativeSmoothScrollElement> = [];
   private options: Required<NativeSmoothScrollOptions> = DEFAULT_OPTIONS;
+  private resizeObserver: ResizeObserver | null = null;
+
   // eslint-disable-next-line @typescript-eslint/naming-convention
   private _isEnabled: boolean = true;
   private isTabbing: boolean = false;
@@ -52,12 +56,20 @@ export class NativeSmoothScroll {
     );
 
     gsap.ticker.add(this.updateScrollPosition);
+
+    if (this.options.isResizeObserverEnabled) {
+      this.resizeObserver = new ResizeObserver(this.onResize);
+    }
   }
 
   public addElement(element: HTMLElement, options?: NativeSmoothScrollElementOptions) {
     const elementInstance = new NativeSmoothScrollElement(element, options);
 
     this.elements.push(elementInstance);
+
+    if (this.options.isResizeObserverEnabled) {
+      this.resizeObserver?.observe(element);
+    }
 
     this.invalidate();
 
@@ -76,6 +88,10 @@ export class NativeSmoothScroll {
 
     if (instance) {
       this.elements = this.elements.filter((elementInstance) => elementInstance !== instance);
+
+      if (this.options.isResizeObserverEnabled && instance.element) {
+        this.resizeObserver?.unobserve(instance.element);
+      }
 
       instance.destruct();
 
