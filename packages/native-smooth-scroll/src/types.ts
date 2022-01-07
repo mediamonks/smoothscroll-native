@@ -8,3 +8,10 @@ export interface Bounds {
   readonly x: number;
   readonly y: number;
 }
+
+export interface ScrollOptions {
+  align?: Align;
+  shouldIgnoreWhenVisible?: boolean;
+}
+
+export type Align = 'top' | 'middle' | 'bottom';
