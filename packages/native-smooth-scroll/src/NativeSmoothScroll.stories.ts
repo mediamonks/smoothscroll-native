@@ -250,9 +250,7 @@ export const StickyElement = () => {
 
 export const Lock = () => {
   useEffect(() => {
-    const nativeSmoothScroll = getNativeSmoothScrollInstance('#scroll-container', {
-      isEnabled: false,
-    });
+    const nativeSmoothScroll = getNativeSmoothScrollInstance('#scroll-container');
     addScrollElements(nativeSmoothScroll, '.scroll-element');
 
     const lockCheckbox = global.document.querySelector<HTMLInputElement>('#locked');
@@ -309,9 +307,7 @@ export const Lock = () => {
 
 export const ScrollTo = () => {
   useEffect(() => {
-    const nativeSmoothScroll = getNativeSmoothScrollInstance('#scroll-container', {
-      isEnabled: false,
-    });
+    const nativeSmoothScroll = getNativeSmoothScrollInstance('#scroll-container');
     const instances = addScrollElements(nativeSmoothScroll, '.scroll-element');
 
     const lockCheckbox = global.document.querySelector<HTMLInputElement>('#locked');
@@ -335,6 +331,18 @@ export const ScrollTo = () => {
       });
     }
 
+    const getScrollOptions = () => {
+      return {
+        align:
+          (global.document.querySelector<HTMLInputElement>('input[name="align"]:checked')?.value as
+            | 'top'
+            | 'middle'
+            | 'bottom') || 'top',
+        shouldIgnoreWhenVisible:
+          global.document.querySelector<HTMLInputElement>('#ignore')?.checked || false,
+      };
+    };
+
     const randomElement = global.document.querySelector<HTMLInputElement>('#randomElement');
     const elementScrollButton =
       global.document.querySelector<HTMLInputElement>('#elementScrollButton');
@@ -349,29 +357,30 @@ export const ScrollTo = () => {
 
     elementScrollButton?.addEventListener('click', () => {
       if (randomElement) {
-        nativeSmoothScroll?.scrollTo(randomElement);
+        nativeSmoothScroll?.scrollTo(randomElement, getScrollOptions());
       }
     });
 
     idScrollButton?.addEventListener('click', () => {
-      nativeSmoothScroll?.scrollTo('idElement');
+      nativeSmoothScroll?.scrollTo('idElement', getScrollOptions());
     });
 
     instanceScrollButton?.addEventListener('click', () => {
       if (instances[1]) {
-        nativeSmoothScroll?.scrollTo(instances[1]);
+        nativeSmoothScroll?.scrollTo(instances[1], getScrollOptions());
       }
     });
 
     instanceElementScrollButton?.addEventListener('click', () => {
       if (instances[3] && instances[3].element) {
-        nativeSmoothScroll?.scrollTo(instances[3].element);
+        nativeSmoothScroll?.scrollTo(instances[3].element, getScrollOptions());
       }
     });
 
     positionScrollButton?.addEventListener('click', () => {
       nativeSmoothScroll?.scrollTo(
         (document.documentElement.scrollHeight - window.innerHeight) * Math.random(),
+        getScrollOptions(),
       );
     });
 
@@ -400,17 +409,88 @@ export const ScrollTo = () => {
                 Smooth Scroll Enabled
             </label>
         </div>
-        <button id="elementScrollButton" class="btn btn-primary">Scroll to element</button>
-        <button id="idScrollButton" class="btn btn-primary">Scroll to id</button>
-        <button id="instanceScrollButton" class="btn btn-primary">Scroll to instance</button>
-        <button id="instanceElementScrollButton" class="btn btn-primary">Scroll to instance element</button>
-        <button id="positionScrollButton" class="btn btn-primary">Scroll to random position</button>
+        <div>
+          <button id="elementScrollButton" class="btn btn-primary">Scroll to element</button>
+          <button id="idScrollButton" class="btn btn-primary">Scroll to id</button>
+          <button id="instanceScrollButton" class="btn btn-primary">Scroll to instance</button>
+          <button id="instanceElementScrollButton" class="btn btn-primary">Scroll to instance element</button>
+          <button id="positionScrollButton" class="btn btn-primary">Scroll to random position</button>
+        </div>
+        <div>
+          Align:
+          <div class="form-check-inline">
+            <input class="form-check-input" type="radio" name="align" id="alignTop" checked value="top">
+            <label class="form-check-label" for="alignTop">
+              Top
+            </label>
+          </div>
+          <div class="form-check-inline">
+            <input class="form-check-input" type="radio" name="align" id="alignMiddle" value="middle">
+            <label class="form-check-label" for="alignMiddle">
+              Middle
+            </label>
+          </div>
+          <div class="form-check-inline">
+            <input class="form-check-input" type="radio" name="align" id="alignBottom" value="bottom">
+            <label class="form-check-label" for="alignBottom">
+              Bottom
+            </label>
+          </div>
+        </div>
+        <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" id="ignore">
+              <label class="form-check-label" for="ignore">
+                  Should Ignore When Visible
+              </label>
+          </div>
       </div>
       <div id="scroll-container">
         <div class="scroll-element scroll-element-1">1 <div id="randomElement">I am an element</div></div>
         <div class="scroll-element scroll-element-2">2 (I am an instance)</div>
         <div class="scroll-element scroll-element-3" id="idElement">3 (I have an id)</div>
         <div class="scroll-element scroll-element-4">4 (I am an instance element)</div>
+        <div class="scroll-element scroll-element-3">5</div>
+        <div class="scroll-element scroll-element-3">6</div>
+      </div>
+   `;
+};
+
+export const Tab = () => {
+  useEffect(() => {
+    const nativeSmoothScroll = getNativeSmoothScrollInstance('#scroll-container');
+    addScrollElements(nativeSmoothScroll, '.scroll-element');
+
+    const enableCheckbox = global.document.querySelector<HTMLInputElement>('#enabled');
+
+    if (enableCheckbox) {
+      nativeSmoothScroll?.setIsEnabled(enableCheckbox.checked);
+
+      enableCheckbox.addEventListener('change', () => {
+        nativeSmoothScroll?.setIsEnabled(enableCheckbox.checked);
+      });
+    }
+
+    return () => {
+      if (nativeSmoothScroll) {
+        nativeSmoothScroll.destruct();
+      }
+    };
+  });
+
+  return `
+     <div class="button-bar">
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" checked id="enabled">
+            <label class="form-check-label" for="enabled">
+                Smooth Scroll Enabled
+            </label>
+        </div>
+      </div>
+     <div id="scroll-container">
+        <div class="scroll-element scroll-element-1">1 <button class="btn btn-primary">Button</button></div>
+        <div class="scroll-element scroll-element-2">2 <button class="btn btn-primary">Button</button></div>
+        <div class="scroll-element scroll-element-3">3 <button class="btn btn-primary">Button</button></div>
+        <div class="scroll-element scroll-element-4">4 <button class="btn btn-primary">Button</button></div>
       </div>
    `;
 };

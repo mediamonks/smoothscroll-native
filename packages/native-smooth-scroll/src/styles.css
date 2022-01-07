@@ -11,12 +11,12 @@ body {
 }
 
 .scroll-element-1 {
-  height: 100vh;
+  height: 101vh;
   background-color: #007FFF;
 }
 
 .scroll-element-2 {
-  height: 100vh;
+  height: 50vh;
   background-color: #32de84;
 }
 
@@ -26,7 +26,7 @@ body {
 }
 
 .scroll-element-4 {
-  height: 100vh;
+  height: 50vh;
   background: linear-gradient(0deg, #EF0107 0%, rgba(253,187,45,1) 100%);
 }
 
@@ -35,9 +35,10 @@ body {
   position: fixed;
   bottom: 0;
   z-index: 1;
-  background-color: white;
+  background-color: rgba(255,255, 255, 0.5);
   border-top: 1px solid gray;
   padding: 10px;
+  color: black;
 }
 
 .sticky {
