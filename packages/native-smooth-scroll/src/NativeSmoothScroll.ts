@@ -24,6 +24,7 @@ export class NativeSmoothScroll {
   private options: Required<NativeSmoothScrollOptions> = DEFAULT_OPTIONS;
   // eslint-disable-next-line @typescript-eslint/naming-convention
   private _isEnabled: boolean = true;
+  private isTabbing: boolean = false;
 
   private scrollPosition: number = 0;
   private targetScrollPosition: number = 0;
@@ -37,6 +38,7 @@ export class NativeSmoothScroll {
 
     window.addEventListener('scroll', this.onScroll, { passive: true });
     window.addEventListener('resize', this.onResize, { passive: true });
+    window.addEventListener('keydown', this.onKeyDown);
 
     this.scrollPosition = window.scrollY;
     this.targetScrollPosition = this.scrollPosition;
@@ -101,7 +103,7 @@ export class NativeSmoothScroll {
 
   public invalidate() {
     this.updateSizes();
-    this.update();
+    this.update(true);
   }
 
   public scrollTo(
@@ -157,13 +159,13 @@ export class NativeSmoothScroll {
     }
   }
 
-  private update() {
+  private update(force: boolean = false) {
     if (!this.isEnabled) {
       return;
     }
 
     this.elements.forEach((element) => {
-      element.update(this.viewportHeight, this.scrollPosition);
+      element.update(this.viewportHeight, this.scrollPosition, force, !this.isTabbing);
     });
   }
 
@@ -198,8 +200,7 @@ export class NativeSmoothScroll {
   private readonly onResize = debounce(() => {
     this.viewportHeight = window.innerHeight;
 
-    this.updateSizes();
-    this.update();
+    this.invalidate();
   }, 200);
 
   private readonly onFocusIn = (event: FocusEvent) => {
@@ -210,6 +211,26 @@ export class NativeSmoothScroll {
       });
     }
   };
+
+  private readonly onKeyDown = (event: KeyboardEvent) => {
+    if (event.code === 'Tab') {
+      if (!this.isTabbing) {
+        this.isTabbing = true;
+
+        this.elements.forEach((element) => {
+          element.resetVisibility();
+        });
+      }
+
+      this.resetTabbing();
+    }
+  };
+
+  private readonly resetTabbing = debounce(() => {
+    this.isTabbing = false;
+
+    this.update(true);
+  }, 1000);
 
   private readonly updateScrollPosition = () => {
     if (Math.abs(this.scrollPosition - this.targetScrollPosition) > 0.001) {

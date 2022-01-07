@@ -53,12 +53,17 @@ export class NativeSmoothScrollElement {
     }
   }
 
+  public resetVisibility() {
+    gsap.set(this.element, {
+      visibility: 'visible',
+    });
+  }
+
   public applyStyles() {
     gsap.set(this.element, {
       position: 'fixed',
       top: 0,
       left: 0,
-      y: this.position,
       willChange: 'transform',
     });
 
@@ -75,7 +80,12 @@ export class NativeSmoothScrollElement {
     }
   }
 
-  public update(viewportHeight: number, scrollPosition: number) {
+  public update(
+    viewportHeight: number,
+    scrollPosition: number,
+    force: boolean = false,
+    updateVisibility: boolean = true,
+  ) {
     if (this.bounds) {
       const rawPosition = Math.round(this.bounds.top - scrollPosition);
       const minPosition = -this.bounds.height;
@@ -95,10 +105,11 @@ export class NativeSmoothScrollElement {
         gsap.utils.normalize(maxPosition, minPosition, rawPosition),
       );
 
-      if (this.position !== position) {
+      if (force || this.position !== position) {
         gsap.set(this.element, {
           y: position,
-          visibility: 'visible',
+          visibility:
+            updateVisibility && (this.progress === 0 || this.progress === 1) ? 'hidden' : 'visible',
         });
 
         this.position = position;
