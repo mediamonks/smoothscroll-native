@@ -1,5 +1,5 @@
 import gsap from 'gsap';
-import type { Bounds } from './types';
+import type { Align, Bounds } from './types';
 import { getRelativePosition, getStickyPosition } from './utils/positionUtils';
 
 export interface NativeSmoothScrollElementOptions {
@@ -98,7 +98,7 @@ export class NativeSmoothScrollElement {
       if (this.position !== position) {
         gsap.set(this.element, {
           y: position,
-          visibility: this.progress === 0 || this.progress === 1 ? 'hidden' : 'visible',
+          visibility: 'visible',
         });
 
         this.position = position;
@@ -106,25 +106,19 @@ export class NativeSmoothScrollElement {
     }
   }
 
-  public getRelativeChildPosition(target: string | HTMLElement) {
+  public getRelativeChildPosition(target: string | HTMLElement, align: Align = 'top') {
     if (this.element) {
       if (target instanceof HTMLElement) {
-        if (target === this.element) {
-          return 0;
-        }
-
-        if (this.element?.contains(target)) {
-          return getRelativePosition(target, this.element);
+        if (target === this.element || this.element?.contains(target)) {
+          return getRelativePosition(target, this.element, align);
         }
       } else {
-        if (this.element?.matches(`#${target}`)) {
-          return 0;
-        }
-
-        const targetElement = this.element?.querySelector<HTMLElement>(`#${target}`);
+        const targetElement =
+          (this.element?.matches(`#${target}`) && this.element) ||
+          this.element?.querySelector<HTMLElement>(`#${target}`);
 
         if (targetElement) {
-          return getRelativePosition(targetElement, this.element);
+          return getRelativePosition(targetElement, this.element, align);
         }
       }
     }
