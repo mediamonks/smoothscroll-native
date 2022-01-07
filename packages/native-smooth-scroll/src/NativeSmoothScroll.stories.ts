@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */
 import global from 'global';
 import { useEffect } from '@storybook/client-api';
+import gsap from 'gsap';
 
 import './styles.css';
 import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
@@ -51,6 +52,7 @@ const defaultHtml = `<div id="scroll-container">
 export const Default = () => {
   useEffect(() => {
     const nativeSmoothScroll = getNativeSmoothScrollInstance('#scroll-container');
+
     addScrollElements(nativeSmoothScroll, '.scroll-element');
 
     return () => {
@@ -493,4 +495,39 @@ export const Tab = () => {
         <div class="scroll-element scroll-element-4">4 <button class="btn btn-primary">Button</button></div>
       </div>
    `;
+};
+
+export const ResizeObserver = () => {
+  useEffect(() => {
+    const nativeSmoothScroll = getNativeSmoothScrollInstance('#scroll-container', {
+      isResizeObserverEnabled: true,
+    });
+
+    const instances = addScrollElements(nativeSmoothScroll, '.scroll-element');
+
+    const button = global.document.querySelector<HTMLElement>('#button');
+
+    if (button) {
+      button.addEventListener('click', () => {
+        if (instances[1]) {
+          gsap.set(instances[1].element, { height: 200 + Math.random() * 1000 });
+        }
+      });
+    }
+
+    return () => {
+      if (nativeSmoothScroll) {
+        nativeSmoothScroll.destruct();
+      }
+    };
+  });
+
+  return `
+    <div id="scroll-container">
+      <div class="scroll-element scroll-element-1">1</div>
+      <div class="scroll-element scroll-element-2">2 <button id="button" class="btn btn-primary">Change Size</button></div>
+      <div class="scroll-element scroll-element-3">3 </div>
+      <div class="scroll-element scroll-element-4">4 </div>
+    </div>
+  `;
 };
