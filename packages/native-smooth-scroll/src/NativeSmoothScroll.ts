@@ -5,6 +5,8 @@ import {
   NativeSmoothScrollElementOptions,
 } from './NativeSmoothScrollElement';
 import { hasTouchSupport, prefersReducedMotion } from './utils/featureDetectionUtils';
+import type { ScrollOptions } from './types';
+import { getAlignPosition, getAlignPositionByElement } from './utils';
 
 export interface NativeSmoothScrollOptions {
   lerp?: number;
@@ -30,6 +32,8 @@ export class NativeSmoothScroll {
   public init(container: HTMLElement, options?: NativeSmoothScrollOptions) {
     this.container = container;
     this.options = { ...DEFAULT_OPTIONS, ...options };
+
+    this.container.addEventListener('focusin', this.onFocusIn);
 
     window.addEventListener('scroll', this.onScroll, { passive: true });
     window.addEventListener('resize', this.onResize, { passive: true });
@@ -100,20 +104,24 @@ export class NativeSmoothScroll {
     this.update();
   }
 
-  public scrollTo(target: string | number | NativeSmoothScrollElement | HTMLElement) {
+  public scrollTo(
+    target: string | number | NativeSmoothScrollElement | HTMLElement,
+    options?: ScrollOptions,
+  ) {
     let targetPosition: number | null = null;
 
     if (isNumber(target)) {
       targetPosition = target;
     } else if (target instanceof NativeSmoothScrollElement) {
       if (this.isEnabled) {
-        targetPosition = target.top;
-      } else {
-        targetPosition = (target.element?.getBoundingClientRect().top || 0) + window.scrollY;
+        targetPosition = getAlignPosition(target.top, target.height, options?.align || 'top');
+      } else if (target.element) {
+        targetPosition =
+          getAlignPositionByElement(target.element, options?.align || 'top') + window.scrollY;
       }
     } else {
       for (const elementInstance of this.elements) {
-        const position = elementInstance.getRelativeChildPosition(target);
+        const position = elementInstance.getRelativeChildPosition(target, options?.align || 'top');
 
         if (position !== null) {
           targetPosition =
@@ -127,7 +135,25 @@ export class NativeSmoothScroll {
     }
 
     if (targetPosition !== null) {
-      window.scroll({ left: 0, top: targetPosition, behavior: this.isEnabled ? 'auto' : 'smooth' });
+      const alignedPosition =
+        targetPosition - getAlignPosition(0, this.viewportHeight, options?.align || 'top');
+
+      if (options?.shouldIgnoreWhenVisible) {
+        const scrollPosition = window.scrollY;
+
+        if (
+          targetPosition > scrollPosition &&
+          targetPosition < scrollPosition + this.viewportHeight
+        ) {
+          return;
+        }
+      }
+
+      window.scroll({
+        left: 0,
+        top: alignedPosition,
+        behavior: this.isEnabled ? 'auto' : 'smooth',
+      });
     }
   }
 
@@ -175,6 +201,15 @@ export class NativeSmoothScroll {
     this.updateSizes();
     this.update();
   }, 200);
+
+  private readonly onFocusIn = (event: FocusEvent) => {
+    if (event.target) {
+      this.scrollTo(event.target as HTMLElement, {
+        align: 'middle',
+        shouldIgnoreWhenVisible: true,
+      });
+    }
+  };
 
   private readonly updateScrollPosition = () => {
     if (Math.abs(this.scrollPosition - this.targetScrollPosition) > 0.001) {
