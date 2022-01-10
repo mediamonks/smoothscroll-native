@@ -19,6 +19,8 @@ export class NativeSmoothScrollElement {
   private position: number = 0;
   private progress: number = 0;
   private readonly options: Required<NativeSmoothScrollElementOptions>;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  private _isDestructed: boolean = false;
 
   public constructor(element: HTMLElement, options?: NativeSmoothScrollElementOptions) {
     // eslint-disable-next-line no-underscore-dangle
@@ -38,6 +40,11 @@ export class NativeSmoothScrollElement {
 
   public get top() {
     return this.bounds?.top || 0;
+  }
+
+  public get isDestructed() {
+    // eslint-disable-next-line no-underscore-dangle
+    return this._isDestructed;
   }
 
   public resetStyles() {
@@ -138,6 +145,9 @@ export class NativeSmoothScrollElement {
   }
 
   public destruct() {
+    // eslint-disable-next-line no-underscore-dangle
+    this._isDestructed = true;
+
     // eslint-disable-next-line no-underscore-dangle
     this._element = null;
     this.bounds = null;
