@@ -2,6 +2,7 @@
 import global from 'global';
 import { useEffect } from '@storybook/client-api';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 import './styles.css';
 import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
@@ -527,6 +528,89 @@ export const ResizeObserver = () => {
       <div class="scroll-element scroll-element-1">1</div>
       <div class="scroll-element scroll-element-2">2 <button id="button" class="btn btn-primary">Change Size</button></div>
       <div class="scroll-element scroll-element-3">3 </div>
+      <div class="scroll-element scroll-element-4">4 </div>
+    </div>
+  `;
+};
+
+gsap.registerPlugin(ScrollTrigger);
+
+export const ScrollTriggerIntegration = () => {
+  useEffect(() => {
+    const trigger = global.document.querySelector<HTMLElement>('.scroll-element-2');
+
+    const spinner = global.document.querySelector<HTMLElement>('.spinner');
+
+    const tween = gsap.fromTo(spinner, { rotation: 0 }, { rotation: 360 });
+
+    const nativeSmoothScroll = getNativeSmoothScrollInstance('#scroll-container', {
+      onBeforeMeasuring: () => {
+        ScrollTrigger.refresh();
+      },
+    });
+
+    addScrollElements(nativeSmoothScroll, '.scroll-element');
+
+    ScrollTrigger.scrollerProxy(document.body, {
+      scrollTop: (value?: number) => {
+        if (value !== undefined) {
+          nativeSmoothScroll?.scrollTo(value);
+        }
+        return nativeSmoothScroll?.scrollTop || 0;
+      },
+    });
+
+    ScrollTrigger.create({
+      trigger,
+      animation: tween,
+      scrub: true,
+      start: 'top center',
+      end: 'bottom center',
+      markers: true,
+    });
+
+    const button = global.document.querySelector<HTMLElement>('#button');
+
+    if (button) {
+      button.addEventListener('click', () => {
+        nativeSmoothScroll?.invalidate();
+      });
+    }
+
+    const enableCheckbox = global.document.querySelector<HTMLInputElement>('#enabled');
+
+    if (enableCheckbox) {
+      nativeSmoothScroll?.setIsEnabled(enableCheckbox.checked);
+
+      enableCheckbox.addEventListener('change', () => {
+        nativeSmoothScroll?.setIsEnabled(enableCheckbox.checked);
+      });
+    }
+
+    setTimeout(() => {
+      nativeSmoothScroll?.invalidate();
+    });
+
+    return () => {
+      if (nativeSmoothScroll) {
+        nativeSmoothScroll.destruct();
+      }
+    };
+  });
+
+  return `
+    <div class="button-bar">
+       <div class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox" checked id="enabled">
+          <label class="form-check-label" for="enabled">
+              Smooth Scroll Enabled
+          </label>
+       </div>
+    </div>
+    <div id="scroll-container">
+      <div class="scroll-element scroll-element-1">1</div>
+      <div class="scroll-element scroll-element-2">2 <button id="button" class="btn btn-primary">Update</button> <div class="spinner"></div></div>
+      <div class="scroll-element scroll-element-3">3  </div>
       <div class="scroll-element scroll-element-4">4 </div>
     </div>
   `;
