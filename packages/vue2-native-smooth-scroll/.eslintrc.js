@@ -12,7 +12,7 @@ module.exports = {
   },
   overrides: [
     {
-      files: '**/*.stories.ts',
+      files: '**/*.stories.js',
       rules: {
         '@typescript-eslint/naming-convention': [
           'error',
