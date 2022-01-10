@@ -12,12 +12,14 @@ export interface NativeSmoothScrollOptions {
   lerp?: number;
   isEnabled?: boolean;
   isResizeObserverEnabled?: boolean;
+  onBeforeMeasuring?: null | (() => void);
 }
 
 const DEFAULT_OPTIONS: Required<NativeSmoothScrollOptions> = {
   lerp: 0.1,
   isEnabled: true,
   isResizeObserverEnabled: false,
+  onBeforeMeasuring: null,
 };
 
 export class NativeSmoothScroll {
@@ -97,6 +99,10 @@ export class NativeSmoothScroll {
 
       this.invalidate();
     }
+  }
+
+  public get scrollTop() {
+    return this.isEnabled ? this.scrollPosition : window.scrollY;
   }
 
   public get isEnabled() {
@@ -193,6 +199,8 @@ export class NativeSmoothScroll {
     this.elements.forEach((element) => {
       element.resetStyles();
     });
+
+    this.options.onBeforeMeasuring?.();
 
     this.elements.forEach((element) => {
       element.measure(scrollPosition);
