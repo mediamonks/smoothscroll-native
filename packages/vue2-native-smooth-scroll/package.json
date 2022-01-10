@@ -24,11 +24,12 @@
     "README.md"
   ],
   "dependencies": {
-    "@mediamonks/native-smooth-scroll": "file://../native-smooth-scroll/",
+    "@mediamonks/native-smooth-scroll": "file:../native-smooth-scroll",
     "@storybook/vue": "^6.4.9",
     "gsap": "^3.9.1",
     "lodash-es": "^4.17.21",
-    "vue": "^2.6.14"
+    "vue": "^2.6.14",
+    "vue-types": "^4.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",
