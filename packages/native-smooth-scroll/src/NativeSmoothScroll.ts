@@ -35,8 +35,11 @@ export class NativeSmoothScroll {
   private scrollPosition: number = 0;
   private targetScrollPosition: number = 0;
   private viewportHeight: number = 0;
+  private initialized: boolean = false;
 
   public init(container: HTMLElement, options?: NativeSmoothScrollOptions) {
+    this.initialized = true;
+
     this.container = container;
     this.options = { ...DEFAULT_OPTIONS, ...options };
 
@@ -61,6 +64,14 @@ export class NativeSmoothScroll {
 
     if (this.options.isResizeObserverEnabled) {
       this.resizeObserver = new ResizeObserver(this.onResize);
+
+      this.elements.forEach((element) => {
+        if (this.resizeObserver && element.element) {
+          this.resizeObserver.observe(element.element);
+        }
+      });
+    } else {
+      this.invalidate();
     }
   }
 
@@ -88,7 +99,7 @@ export class NativeSmoothScroll {
       instance = element;
     }
 
-    if (instance) {
+    if (instance && !instance.isDestructed) {
       this.elements = this.elements.filter((elementInstance) => elementInstance !== instance);
 
       if (this.options.isResizeObserverEnabled && instance.element) {
@@ -124,8 +135,10 @@ export class NativeSmoothScroll {
   }
 
   public invalidate() {
-    this.updateSizes();
-    this.update(true);
+    if (this.initialized) {
+      this.updateSizes();
+      this.update(true);
+    }
   }
 
   public scrollTo(
@@ -274,8 +287,10 @@ export class NativeSmoothScroll {
     window.removeEventListener('scroll', this.onScroll);
     window.removeEventListener('resize', this.onResize);
 
-    this.elements.forEach((element) => {
-      element.destruct();
-    });
+    this.elements.forEach((element) => this.removeElement(element));
+
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
   }
 }
