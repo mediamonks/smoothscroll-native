@@ -18,8 +18,7 @@
     "test": "jest ./src/",
     "build-storybook": "build-storybook"
   },
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.js",
+  "main": "./dist/vue2-native-smooth-scroll.common.js",
   "files": [
     "dist/**/*",
     "README.md"
@@ -71,10 +70,6 @@
   "engines": {
     "npm": ">= 7.0.0"
   },
-  "exports": {
-    "require": "./dist/cjs/index.js",
-    "import": "./dist/esm/index.js"
-  },
   "keywords": [
     "vue",
     "native",
@@ -85,6 +80,5 @@
   "publishConfig": {
     "access": "public"
   },
-  "repository": "git@github.com:mediamonks/smoothscroll-native.git",
-  "types": "./dist/esm/index.d.ts"
+  "repository": "git@github.com:mediamonks/smoothscroll-native.git"
 }
